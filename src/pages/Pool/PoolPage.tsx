@@ -31,7 +31,7 @@ import { networkPrefix } from 'utils/networkPrefix'
 import { EthereumNetworkInfo } from 'constants/networks'
 import { GenericImageWrapper } from 'components/Logo'
 import { sprintf } from 'sprintf-js'
-import { Transaction } from '../../types'
+import { Transaction, TransactionType } from '../../types'
 
 const ContentLayout = styled.div`
   display: grid;
@@ -65,11 +65,29 @@ function ExportTxToFile(transactions: Transaction[] | undefined) {
   console.log('File created!')
 
   let totalData = 'data:text/csv;charset=utf-8,'
+  totalData +=
+    'type, timestamp, sender, token0Symbol, token1Symbol, amountUSD, amountToken0, amountToken1, price' + '\n'
 
   if (transactions) {
     for (const tx of transactions) {
-      const txStr = sprintf('%s, %s!', tx.timestamp, tx.sender)
-      totalData += txStr + '\n'
+      if (tx.type === TransactionType.SWAP) {
+        const timestamp = new Date(Number(tx.timestamp) * 1000)
+        const type = tx.amountToken0 > 0 ? 'sell' : 'buy'
+        const price = tx.amountToken1 / tx.amountToken0
+        const txStr = sprintf(
+          '%s, %s, %s, %s, %s, %s, %s, %s, %s\n',
+          type,
+          timestamp.toLocaleString().replace(/,/g, ''),
+          tx.sender,
+          tx.token0Symbol,
+          tx.token1Symbol,
+          tx.amountUSD,
+          Math.abs(tx.amountToken0),
+          Math.abs(tx.amountToken1),
+          Math.abs(price).toPrecision(6)
+        )
+        totalData += txStr
+      }
     }
   }
 
