@@ -132,7 +132,7 @@ const DataRow = ({ transaction, color }: { transaction: Transaction; color?: str
 
 export default function TransactionTable({
   transactions,
-  maxItems = 10,
+  maxItems = 25,
   color,
 }: {
   transactions: Transaction[]
