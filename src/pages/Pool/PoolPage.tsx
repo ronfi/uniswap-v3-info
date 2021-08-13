@@ -30,7 +30,6 @@ import { useActiveNetworkVersion } from 'state/application/hooks'
 import { networkPrefix } from 'utils/networkPrefix'
 import { EthereumNetworkInfo } from 'constants/networks'
 import { GenericImageWrapper } from 'components/Logo'
-import * as fs from 'fs'
 import { sprintf } from 'sprintf-js'
 import { Transaction } from '../../types'
 
@@ -62,23 +61,20 @@ const ResponsiveRow = styled(RowBetween)`
     width: 100%:
   `};
 `
-function ExportTxToFile(transactions: Transaction[]) {
+function ExportTxToFile(transactions: Transaction[] | undefined) {
   console.log('File created!')
 
-  const writeStream = fs.createWriteStream('tx.csv')
+  let totalData = 'data:text/csv;charset=utf-8,'
 
-  for (const tx of transactions) {
-    const txStr = sprintf('%s %s!', tx.timestamp, tx.sender)
-    writeStream.write(txStr)
+  if (transactions) {
+    for (const tx of transactions) {
+      const txStr = sprintf('%s, %s!', tx.timestamp, tx.sender)
+      totalData += txStr + '\n'
+    }
   }
 
-  // the finish event is emitted when all data has been flushed from the stream
-  writeStream.on('finish', () => {
-    console.log('wrote all tx data to file')
-  })
-
-  // close the stream
-  writeStream.end()
+  const encodedUri = encodeURI(totalData)
+  window.open(encodedUri)
 }
 
 enum ChartView {
@@ -341,7 +337,7 @@ export default function PoolPage({
             </DarkGreyCard>
           </ContentLayout>
           <TYPE.main fontSize="24px">Transactions</TYPE.main>
-          <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile({ transactions })}>
+          <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile(transactions)}>
             Export
           </ButtonPrimary>
           <DarkGreyCard>
