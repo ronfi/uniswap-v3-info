@@ -61,29 +61,26 @@ const ResponsiveRow = styled(RowBetween)`
     width: 100%:
   `};
 `
-function ExportTxToFile(transactions: Transaction[] | undefined) {
-  console.log('File created!')
-
+function ExportTxToFile(token0Symbol: string, token1Symbol: string, transactions: Transaction[] | undefined) {
   let totalData = 'data:text/csv;charset=utf-8,'
+  const priceStr = token0Symbol + ' price on ' + token1Symbol
   totalData +=
-    'type, timestamp, sender, token0Symbol, token1Symbol, amountUSD, amountToken0, amountToken1, price' + '\n'
+    token0Symbol + ' user, timestamp, sender, amountUSD, ' + token0Symbol + ', ' + token1Symbol + ', ' + priceStr + '\n'
 
   if (transactions) {
     for (const tx of transactions) {
-      if (tx.type === TransactionType.SWAP) {
+      if (tx.type === TransactionType.SWAP && tx.token0Symbol === token0Symbol && tx.token1Symbol === token1Symbol) {
         const timestamp = new Date(Number(tx.timestamp) * 1000)
         const type = tx.amountToken0 > 0 ? 'sell' : 'buy'
         const price = tx.amountToken1 / tx.amountToken0
         const txStr = sprintf(
-          '%s, %s, %s, %s, %s, %s, %s, %s, %s\n',
+          '%s, %s, %s, %s, %s, %s, %s\n',
           type,
           timestamp.toLocaleString().replace(/,/g, ''),
           tx.sender,
-          tx.token0Symbol,
-          tx.token1Symbol,
           tx.amountUSD,
-          Math.abs(tx.amountToken0),
-          Math.abs(tx.amountToken1),
+          tx.amountToken0,
+          tx.amountToken1,
           Math.abs(price).toPrecision(6)
         )
         totalData += txStr
@@ -362,7 +359,11 @@ export default function PoolPage({
             </AutoColumn>
             <AutoColumn gap="lg">
               <RowFixed mr="20px" gap="10px" align="center" justify="center">
-                <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile(transactions)}>
+                <ButtonPrimary
+                  width="100px"
+                  style={{ height: '44px' }}
+                  onClick={() => ExportTxToFile(poolData.token0.symbol, poolData.token1.symbol, transactions)}
+                >
                   <RowBetween>
                     <Download size={24} />
                     <div style={{ display: 'flex', alignItems: 'center' }}>Export</div>
