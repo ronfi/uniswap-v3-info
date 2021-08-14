@@ -27,7 +27,7 @@ const POOL_TRANSACTIONS = gql`
       amount1
       amountUSD
     }
-    swaps(first: 100, orderBy: timestamp, orderDirection: desc, where: { pool: $address }) {
+    swaps(first: 500, orderBy: timestamp, orderDirection: desc, where: { pool: $address }) {
       timestamp
       transaction {
         id
