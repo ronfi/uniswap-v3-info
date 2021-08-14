@@ -354,10 +354,23 @@ export default function PoolPage({
               )}
             </DarkGreyCard>
           </ContentLayout>
-          <TYPE.main fontSize="24px">Transactions</TYPE.main>
-          <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile(transactions)}>
-            Export
-          </ButtonPrimary>
+          <ResponsiveRow>
+            <AutoColumn gap="lg">
+              <RowFixed mr="20px" gap="10px" align="center" justify="center">
+                <TYPE.main fontSize="24px">Transactions </TYPE.main>
+              </RowFixed>
+            </AutoColumn>
+            <AutoColumn gap="lg">
+              <RowFixed mr="20px" gap="10px" align="center" justify="center">
+                <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile(transactions)}>
+                  <RowBetween>
+                    <Download size={24} />
+                    <div style={{ display: 'flex', alignItems: 'center' }}>Export</div>
+                  </RowBetween>
+                </ButtonPrimary>
+              </RowFixed>
+            </AutoColumn>
+          </ResponsiveRow>
           <DarkGreyCard>
             {transactions ? <TransactionTable transactions={transactions} /> : <LocalLoader fill={false} />}
           </DarkGreyCard>
