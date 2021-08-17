@@ -68,7 +68,8 @@ function ExportTxToFile(token0Symbol: string, token1Symbol: string, transactions
     token0Symbol + ' user, timestamp, sender, amountUSD, ' + token0Symbol + ', ' + token1Symbol + ', ' + priceStr + '\n'
 
   if (transactions) {
-    for (const tx of transactions) {
+    for (let i = transactions.length - 1; i >= 0; i--) {
+      const tx = transactions[i]
       if (tx.type === TransactionType.SWAP && tx.token0Symbol === token0Symbol && tx.token1Symbol === token1Symbol) {
         const timestamp = new Date(Number(tx.timestamp) * 1000)
         const type = tx.amountToken0 > 0 ? 'sell' : 'buy'
