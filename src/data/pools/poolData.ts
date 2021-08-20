@@ -114,6 +114,7 @@ export function usePoolDatas(
     POOLS_BULK(block24?.number, poolAddresses),
     { client: dataClient }
   )
+
   const { loading: loading48, error: error48, data: data48 } = useQuery<PoolDataResponse>(
     POOLS_BULK(block48?.number, poolAddresses),
     { client: dataClient }
