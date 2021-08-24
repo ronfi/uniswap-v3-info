@@ -13,25 +13,52 @@ import { DarkGreyCard } from 'components/Card'
 import { sprintf } from 'sprintf-js'
 // import TopPoolMovers from 'components/pools/TopPoolMovers'
 
-function ExportTxToFile(poolDatas: any) {
-  console.log(poolDatas)
+function exportObjectAsJson(poolDatas: any) {
+  const jsonArray = []
+  if (poolDatas) {
+    for (const poolData of poolDatas) {
+      const element = {
+        poolAddress: poolData.address,
+        token0: poolData.token0,
+        token1: poolData.token1,
+        feeTier: poolData.feeTier,
+      }
+      jsonArray.push(element)
+    }
+  }
+
+  const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(jsonArray))
+  const downloadAnchorNode = document.createElement('a')
+  downloadAnchorNode.setAttribute('href', dataStr)
+  downloadAnchorNode.setAttribute('download', 'v3_top50_pools.json')
+  document.body.appendChild(downloadAnchorNode) // required for firefox
+  downloadAnchorNode.click()
+  downloadAnchorNode.remove()
+}
+
+function exportObjectAsExcel(poolDatas: any) {
   let totalData = 'data:text/csv;charset=utf-8,'
-  totalData += ' token0, token1, fee, tvlUSD, volUSD' + '\n'
+  totalData += 'contractAddress, token0, token1, fee, tvlUSD, volUSD' + '\n'
 
   if (poolDatas) {
     for (const poolData of poolDatas) {
+      const contractAddress = poolData.address
       const token0 = poolData.token0.symbol
       const token1 = poolData.token1.symbol
       const fee = poolData.feeTier
       const tvlUSD = poolData.tvlUSD
       const volUSD = poolData.volumeUSD
-      const txStr = sprintf('%s, %s, %s, %s, %s\n', token0, token1, fee, tvlUSD, volUSD)
+      const txStr = sprintf('%s, %s, %s, %s, %s, %s\n', contractAddress, token0, token1, fee, tvlUSD, volUSD)
       totalData += txStr
     }
   }
 
   const encodedUri = encodeURI(totalData)
   window.open(encodedUri)
+}
+
+function ExportToFile(poolDatas: any) {
+  exportObjectAsJson(poolDatas)
 }
 
 export default function PoolPage() {
@@ -76,7 +103,7 @@ export default function PoolPage() {
       </AutoColumn>
       <AutoColumn gap="lg">
         <RowFixed mr="20px" gap="10px" align="center" justify="center">
-          <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportTxToFile(poolDatas)}>
+          <ButtonPrimary width="100px" style={{ height: '44px' }} onClick={() => ExportToFile(poolDatas)}>
             <RowBetween>
               <Download size={24} />
               <div style={{ display: 'flex', alignItems: 'center' }}>Export</div>
